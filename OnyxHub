@@ -1,0 +1,77 @@
+local RunService = game:GetService("RunService")
+local gui = Instance.new("ScreenGui")
+gui.Name = "Slap Aura"
+gui.ResetOnSpawn = false
+
+local frame = Instance.new("Frame", gui)
+frame.Name = "Main"
+frame.Active = true
+frame.Draggable = true
+frame.Position = UDim2.new(0.5, -100, 0, 50)
+frame.Size = UDim2.new(0, 200, 0, 50)
+frame.AnchorPoint = Vector2.new(0.5, 0)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frame.BorderSizePixel = 0
+frame.ClipsDescendants = true
+frame.ZIndex = 10
+
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0, 10)
+
+local text = Instance.new("TextLabel", frame)
+text.Name = "SlapAuraStatus"
+text.Text = "Slap Aura is OFF"
+text.Size = UDim2.new(1, 0, 1, 0)
+text.TextColor3 = Color3.fromRGB(255, 165, 0)
+text.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+text.BackgroundTransparency = 1
+text.Font = Enum.Font.SourceSans
+text.TextSize = 20
+text.ZIndex = 11
+
+local button = Instance.new("TextButton", gui)
+button.Name = "ToggleSlapAura"
+button.Position = UDim2.new(0, 10, 0, 10)
+button.Size = UDim2.new(0, 100, 0, 30)
+button.AnchorPoint = Vector2.new(0, 0)
+button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+button.BorderSizePixel = 0
+button.Font = Enum.Font.SourceSans
+button.Text = "Toggle Slap Aura"
+button.TextColor3 = Color3.fromRGB(255, 165, 0)
+button.TextSize = 20
+button.ZIndex = 11
+
+local function toggleSlapAura()
+    if text.Text == "Slap Aura is OFF" then
+        text.Text = "Slap Aura is ON"
+    else
+        text.Text = "Slap Aura is OFF"
+    end
+end
+
+button.MouseButton1Click:Connect(toggleSlapAura)
+
+RunService.Heartbeat:Connect(function()
+    if text.Text == "Slap Aura is ON" then
+        local character = game.Players.LocalPlayer.Character
+        if character then
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                for _, player in ipairs(game.Players:GetPlayers()) do
+                    if player ~= game.Players.LocalPlayer then
+                        local targetCharacter = player.Character
+                        if targetCharacter then
+                            local targetHumanoid = targetCharacter:FindFirstChildOfClass("Humanoid")
+                            if targetHumanoid and targetHumanoid.Health > 0 and (targetCharacter.PrimaryPart.Position - character.PrimaryPart.Position).Magnitude <= 55 then
+                                game.ReplicatedStorage.SnowHit:FireServer(targetCharacter.PrimaryPart)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
+
+gui.Parent = game.Players.LocalPlayer.PlayerGui
